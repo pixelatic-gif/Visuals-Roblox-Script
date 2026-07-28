@@ -1,5 +1,5 @@
 its EVEN dont a stealer. Its a visual script that can: 
- Mamake an ghost phantom
+ Make an ghost phantom
    track mm2 knife with trail
    rainbow wings
    trail
