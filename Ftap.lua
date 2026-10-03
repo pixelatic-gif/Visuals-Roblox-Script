@@ -6,7 +6,7 @@ local UserInputService = game:GetService("UserInputService")
 local player = Players.LocalPlayer
 local camera = Workspace.CurrentCamera
 
--- Скорость персонажа (стандартная 16, настраиваемая до 70)
+-- Скорость персонажа (стандартная 16, настраиваемая от 16 до 70)
 local characterSpeed = 30 -- Начальное значение
 
 local isControlling = false
@@ -24,10 +24,10 @@ local pitch = 0
 -- 1. GUI В СТИЛЕ BUILD A BOAT FOR TREASURE (ПЕРЕТАСКИВАЕМОЕ)
 -- =================================================================
 local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "FTAP_DraggableRocketGUI"
+screenGui.Name = "FTAP_KeybindRocketGUI"
 screenGui.ResetOnSpawn = false
 
-local oldGui = player:WaitForChild("PlayerGui"):FindFirstChild("FTAP_DraggableRocketGUI")
+local oldGui = player:WaitForChild("PlayerGui"):FindFirstChild("FTAP_KeybindRocketGUI")
 if oldGui then oldGui:Destroy() end
 
 screenGui.Parent = player:WaitForChild("PlayerGui")
@@ -51,15 +51,15 @@ frameStroke.Color = Color3.fromRGB(212, 175, 55)
 frameStroke.Thickness = 2.5
 frameStroke.Parent = babftFrame
 
--- Заголовок (Плашка для перетаскивания)
+-- Заголовок
 local titleLabel = Instance.new("TextLabel")
 titleLabel.Name = "TitleHeader"
 titleLabel.Size = UDim2.new(1, 0, 0, 30)
 titleLabel.Position = UDim2.new(0, 0, 0, 2)
 titleLabel.BackgroundTransparency = 1
-titleLabel.Text = "🚀 РАКЕТА FTAP (✋ ТАЩИ)"
+titleLabel.Text = "🚀 FTAP (Q: Полёт | X/C: Скорость)"
 titleLabel.TextColor3 = Color3.fromRGB(255, 225, 150)
-titleLabel.TextSize = 13
+titleLabel.TextSize = 12
 titleLabel.Font = Enum.Font.FredokaOne
 titleLabel.Parent = babftFrame
 
@@ -69,7 +69,7 @@ mainButton.Name = "MainButton"
 mainButton.Size = UDim2.new(0.9, 0, 0, 40)
 mainButton.Position = UDim2.new(0.05, 0, 0.24, 0)
 mainButton.BackgroundColor3 = Color3.fromRGB(45, 180, 90)
-mainButton.Text = "🚀 УПРАВЛЯТЬ (НАЦЕЛЬСЯ)"
+mainButton.Text = "🚀 УПРАВЛЯТЬ [Q]"
 mainButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 mainButton.Font = Enum.Font.FredokaOne
 mainButton.TextSize = 13
@@ -79,7 +79,7 @@ local btnCorner = Instance.new("UICorner")
 btnCorner.CornerRadius = UDim.new(0, 8)
 btnCorner.Parent = mainButton
 
--- --- БЛОК РЕГУЛИРОВКИ СКОРОСТИ (16 - 70) ---
+-- --- БЛОК РЕГУЛИРОВКИ СКОРОСТИ ---
 local speedLabel = Instance.new("TextLabel")
 speedLabel.Size = UDim2.new(1, 0, 0, 20)
 speedLabel.Position = UDim2.new(0, 0, 0.55, 0)
@@ -90,30 +90,30 @@ speedLabel.Font = Enum.Font.FredokaOne
 speedLabel.TextSize = 12
 speedLabel.Parent = babftFrame
 
--- Кнопка МЕНЬШЕ (-)
+-- Кнопка МЕНЬШЕ (-) [C]
 local minusBtn = Instance.new("TextButton")
-minusBtn.Size = UDim2.new(0, 35, 0, 30)
+minusBtn.Size = UDim2.new(0, 45, 0, 30)
 minusBtn.Position = UDim2.new(0.08, 0, 0.72, 0)
 minusBtn.BackgroundColor3 = Color3.fromRGB(70, 55, 45)
-minusBtn.Text = "-"
+minusBtn.Text = "- [C]"
 minusBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 minusBtn.Font = Enum.Font.FredokaOne
-minusBtn.TextSize = 18
+minusBtn.TextSize = 13
 minusBtn.Parent = babftFrame
 
 local minusCorner = Instance.new("UICorner")
 minusCorner.CornerRadius = UDim.new(0, 6)
 minusCorner.Parent = minusBtn
 
--- Кнопка БОЛЬШЕ (+)
+-- Кнопка БОЛЬШЕ (+) [X]
 local plusBtn = Instance.new("TextButton")
-plusBtn.Size = UDim2.new(0, 35, 0, 30)
-plusBtn.Position = UDim2.new(0.77, 0, 0.72, 0)
+plusBtn.Size = UDim2.new(0, 45, 0, 30)
+plusBtn.Position = UDim2.new(0.73, 0, 0.72, 0)
 plusBtn.BackgroundColor3 = Color3.fromRGB(70, 55, 45)
-plusBtn.Text = "+"
+plusBtn.Text = "+ [X]"
 plusBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 plusBtn.Font = Enum.Font.FredokaOne
-plusBtn.TextSize = 18
+plusBtn.TextSize = 13
 plusBtn.Parent = babftFrame
 
 local plusCorner = Instance.new("UICorner")
@@ -122,8 +122,8 @@ plusCorner.Parent = plusBtn
 
 -- Индикатор скорости
 local speedBarBg = Instance.new("Frame")
-speedBarBg.Size = UDim2.new(0.5, 0, 0, 12)
-speedBarBg.Position = UDim2.new(0.25, 0, 0.78, 0)
+speedBarBg.Size = UDim2.new(0.42, 0, 0, 12)
+speedBarBg.Position = UDim2.new(0.29, 0, 0.78, 0)
 speedBarBg.BackgroundColor3 = Color3.fromRGB(20, 15, 10)
 speedBarBg.Parent = babftFrame
 
@@ -142,7 +142,7 @@ minusBtn.MouseButton1Click:Connect(function() updateSpeed(characterSpeed - 5) en
 plusBtn.MouseButton1Click:Connect(function() updateSpeed(characterSpeed + 5) end)
 
 -- =================================================================
--- 2. ЛОГИКА ПЕРЕТАСКИВАНИЯ ОКНА (DRAGGABLE GUI)
+-- 2. ЛОГИКА ПЕРЕТАСКИВАНИЯ ОКНА
 -- =================================================================
 local dragging = false
 local dragInput, dragStart, startPos
@@ -192,10 +192,9 @@ local function stopControl()
 
 	UserInputService.MouseBehavior = Enum.MouseBehavior.Default
 
-	mainButton.Text = "🚀 УПРАВЛЯТЬ (НАЦЕЛЬСЯ)"
+	mainButton.Text = "🚀 УПРАВЛЯТЬ [Q]"
 	mainButton.BackgroundColor3 = Color3.fromRGB(45, 180, 90)
 
-	-- Моментальный возврат камеры на голову
 	camera.CameraType = Enum.CameraType.Custom
 	if player.Character and player.Character:FindFirstChild("Humanoid") then
 		camera.CameraSubject = player.Character.Humanoid
@@ -247,7 +246,7 @@ local function startControl(target)
 	isControlling = true
 	currentRocket = target
 
-	mainButton.Text = "🛑 STOP / СБРОС"
+	mainButton.Text = "🛑 STOP / СБРОС [Q]"
 	mainButton.BackgroundColor3 = Color3.fromRGB(200, 45, 45)
 
 	local rx, ry, rz = nosePart.CFrame:ToOrientation()
@@ -289,14 +288,13 @@ local function startControl(target)
 		end
 
 		local look = camera.CFrame.LookVector
-		-- Пересчитываем скорость персонажа (16..70) в физическую скорость ракеты
 		local actualRocketSpeed = characterSpeed * 4.5 
 		nosePart.AssemblyLinearVelocity = look * actualRocketSpeed
 		nosePart.CFrame = CFrame.lookAt(nosePart.Position, nosePart.Position + look)
 	end)
 end
 
-mainButton.MouseButton1Click:Connect(function()
+local function toggleControl()
 	if isControlling then
 		stopControl()
 	else
@@ -304,5 +302,22 @@ mainButton.MouseButton1Click:Connect(function()
 		if target then
 			startControl(target)
 		end
+	end
+end
+
+mainButton.MouseButton1Click:Connect(toggleControl)
+
+-- =================================================================
+-- 5. ОБРАБОТКА ГОРЯЧИХ КЛАВИШ (Q, X, C)
+-- =================================================================
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+	if gameProcessed then return end
+
+	if input.KeyCode == Enum.KeyCode.Q then
+		toggleControl()
+	elseif input.KeyCode == Enum.KeyCode.X then
+		updateSpeed(characterSpeed + 5)
+	elseif input.KeyCode == Enum.KeyCode.C then
+		updateSpeed(characterSpeed - 5)
 	end
 end)
